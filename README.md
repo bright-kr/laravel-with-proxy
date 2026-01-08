@@ -1,81 +1,81 @@
-# Using Proxies in Laravel
+# Laravel에서 プロキシ 사용하기
 
-[![Bright Data Promo](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.com/)
+[![Bright Data Promo](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.co.kr/)
 
-This guide explains how to configure and implement proxies in a Laravel project for unblocked web scraping and geographic access control.
+이 가이드는 차단 없는 Webスクレイピング 및 지오ロ케ーション 기반 접근 제어를 위해 Laravel 프로젝트에서 プロキシ를 구성하고 구현하는 방법을 설명합니다.
 
-- [What Is a Laravel Proxy?](#what-is-a-laravel-proxy)
-- [Use Cases for Proxies in Laravel](#use-cases-for-proxies-in-laravel)
-- [Using a Proxy in Laravel: Step-By-Step Guide](#using-a-proxy-in-laravel-step-by-step-guide)
-- [Advanced Use Cases](#advanced-use-cases)
-- [Use a Bright Data Proxy in Laravel](#use-a-bright-data-proxy-in-laravel)
-- [Extra: Symfony's `HttpClient` Proxy Integration](#extra-symfonys-httpclient-proxy-integration)
+- [Laravel Proxy란 무엇입니까?](#what-is-a-laravel-proxy)
+- [Laravel에서 プロキ시 사용 사례](#use-cases-for-proxies-in-laravel)
+- [Laravel에서 プロキ시 사용하기: 단계별 가이드](#using-a-proxy-in-laravel-step-by-step-guide)
+- [고급 사용 사례](#advanced-use-cases)
+- [Laravel에서 Bright Data プロキ시 사용하기](#use-a-bright-data-proxy-in-laravel)
+- [추가: Symfony의 `HttpClient` プロキ시 통합](#extra-symfonys-httpclient-proxy-integration)
 
 ## What Is a Laravel Proxy?
 
-A Laravel proxy functions as a middleman between your Laravel application and an external server. It allows you to programmatically direct your server's traffic [through a proxy server](https://brightdata.com/blog/proxy-101/what-is-proxy-server) to conceal your IP address.
+Laravel プロキ시는 Laravel 애플리케이션과 외부 서버 사이에서 중개자 역할을 합니다. 이를 통해 서버 트래픽을 프로그래밍 방식으로 [프로キ시 서버를 통해](https://brightdata.co.kr/blog/proxy-101/what-is-proxy-server) 전달하여 IPアドレス를 숨길 수 있습니다.
 
-Here's how proxies work in Laravel:
+Laravel에서 プロキ시가 동작하는 방식은 다음과 같습니다:
 
-1. Laravel initiates an HTTP request using an HTTP client library with proxy configuration.
-2. The request travels through the proxy server.
-3. The proxy transmits it to the destination server.
-4. The destination server sends a response back to the proxy.
-5. The proxy relays the response to Laravel.
+1. Laravel이 プロキ시 구성이 포함된 HTTP 클라이언트 라이브러리를 사용하여 HTTP リクエスト를 시작합니다.
+2. リクエ스트가 プロキ시 서버를 통해 이동합니다.
+3. プロキ시가 이를 대상 서버로 전송합니다.
+4. 대상 서버가 レスポンス를 プロキ시에 반환합니다.
+5. プロキ시가 レスポンス를 Laravel로 중계합니다.
 
-As a result, the destination server sees the request originating from the proxy's IP—not your Laravel server's address. This mechanism enables bypassing geographic restrictions, enhancing anonymity, and handling rate limitations.
+그 결과, 대상 서버는 리クエ스트가 Laravel 서버가 아니라 プロキ시의 IP에서 발생한 것으로 인식합니다. 이 메커니즘은 지리적 제한 우회, 익명성 강화, レート制限 처리에 도움이 됩니다.
 
 ## Use Cases for Proxies in Laravel
 
-Proxies in Laravel serve numerous purposes, but these three are particularly common:
+Laravel에서 プロキ시는 다양한 목적에 사용되지만, 특히 다음 세 가지가 흔합니다:
 
-- **Web scraping**: Implement proxies to prevent IP blocks, circumvent rate limits, or avoid other restrictions when creating a web scraping API. For additional information, read our tutorial on [web scraping with Laravel](https://brightdata.com/blog/web-data/web-scraping-with-laravel).
-- **Bypassing rate limits on third-party APIs**: Alternate between proxy IPs to remain within API usage quotas and prevent throttling.
-- **Accessing geo-restricted content**: Choose proxy servers in specific locations to use services only available in certain countries.
+- **Webスクレイピング**: Webスクレイピング API를 만들 때 IP 차단을 방지하고, レート制限을 우회하거나, 기타 제한을 피하기 위해 プロキ시를 구현합니다. 추가 정보는 [Laravel로 web scraping하기](https://brightdata.co.kr/blog/web-data/web-scraping-with-laravel) 튜토리얼을 참고하십시오.
+- **서드파티 API의 レート制限 우회**: プロキ시 IP를 번갈아 사용하여 API 사용량 쿼터 내에 머무르고 스로틀링을 방지합니다.
+- **지오 제한 콘텐츠 접근**: 특정 국가에서만 사용 가능한 서비스를 이용하기 위해 특정 위치의 プロキ시 서버를 선택합니다.
 
-For additional examples, consult our guide on [web data and proxy use cases](https://brightdata.com/use-cases).
+추가 예시는 [web data 및 プロキ시 사용 사례](https://brightdata.co.kr/use-cases) 가이드를 참고하십시오.
 
 ## Using a Proxy in Laravel: Step-By-Step Guide
 
-In this section, we'll demonstrate how to incorporate a proxy in Laravel using the [default HTTP client](https://laravel.com/docs/master/http-client). We'll also address proxy integration with the [Symfony `HttpClient`](https://symfony.com/doc/current/http_client.html) library later in this article.
+이 섹션에서는 [기본 HTTP client](https://laravel.com/docs/master/http-client)를 사용하여 Laravel에 プロ키시를 통합하는 방법을 시연합니다. 또한 본문 후반부에서 [Symfony `HttpClient`](https://symfony.com/doc/current/http_client.html) 라이브러리와의 プロ키시 통합도 다룹니다.
 
 > **Note**:
 > 
-> Laravel's HTTP client is built on Guzzle, so you might want to review our [Guzzle proxy integration guide](https://brightdata.com/blog/how-tos/proxy-with-guzzle).
+> Laravel의 HTTP client는 Guzzle 기반이므로, [Guzzle プロ키시 통합 가이드](https://brightdata.co.kr/blog/how-tos/proxy-with-guzzle)도 함께 확인하시는 것이 좋습니다.
 
-To illustrate the integration, we'll establish a `GET` `/api/v1/get-ip` endpoint that:
+통합을 설명하기 위해 다음을 수행하는 `GET` `/api/v1/get-ip` エンドポイント를 구성하겠습니다:
 
-1. Sends a `GET` request to [`https://httpbin.io/ip`](https://httpbin.io/ip) using the configured proxy.
-2. Extracts the exit IP address from the response.
-3. Returns that IP to the client calling the Laravel endpoint.
+1. 구성된 プロ키시를 사용하여 [`https://httpbin.io/ip`](https://httpbin.io/ip)에 `GET` リクエスト를 전송합니다.
+2. レスポンス에서 출구 IPアドレス를 추출합니다.
+3. 해당 IP를 Laravel エンドポイント를 호출한 클라이언트에 반환합니다.
 
-If everything is properly configured, the IP returned by the API will match the proxy's IP address.
+모든 것이 올바르게 구성되었다면, API가 반환하는 IP는 プロ키시의 IPアドレス와 일치합니다.
 
 ### Step #1: Project Setup
 
-If you already have a Laravel application configured, you can skip ahead to Step #2.
+이미 Laravel 애플리케이션이 구성되어 있다면 Step #2로 건너뛰셔도 됩니다.
 
-Otherwise, follow these instructions to create a new Laravel project. Open your terminal and execute the following Composer [`create-command`](https://getcomposer.org/doc/03-cli.md#create-project) to initialize a fresh Laravel project:
+그렇지 않다면 다음 지침에 따라 새 Laravel 프로젝트를 생성하십시오. 터미널을 열고 아래 Composer [`create-command`](https://getcomposer.org/doc/03-cli.md#create-project)를 실행하여 새 Laravel 프로젝트를 초기화합니다:
 
 ```sh
 composer create-project laravel/laravel laravel-proxies-application
 ```
 
-This command will create a new Laravel project in a directory named `laravel-proxies-application`. Open this folder with your preferred PHP IDE.
+이 명령은 `laravel-proxies-application`이라는 디렉터리에 새 Laravel 프로젝트를 생성합니다. 선호하는 PHP IDE로 이 폴더를 여십시오.
 
-At this point, the directory should contain the standard Laravel file structure:
+이 시점에서 디렉터리에는 표준 Laravel 파일 구조가 포함되어 있어야 합니다:
 
 ![The Laravel projext structure](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-Laravel-projext-structure.png)
 
 ### Step #2: Define the Test API Endpoint
 
-In the project directory, execute the following [Artisan command](https://laravel.com/docs/11.x/artisan) to generate a new controller:
+프로젝트 디렉터리에서 다음 [Artisan command](https://laravel.com/docs/11.x/artisan)를 실행하여 새 controller를 생성합니다:
 
 ```sh
 php artisan make:controller IPController
 ```
 
-This will create a file named `IPController.php` in the `/app/Http/Controllers` directory with this default content:
+그러면 `/app/Http/Controllers` 디렉터리에 `IPController.php` 파일이 생성되며 기본 내용은 다음과 같습니다:
 
 ```php
 <?php
@@ -90,7 +90,7 @@ class IPController extends Controller
 }
 ```
 
-Now, add the `getIP()` method below to `IPController.php`:
+이제 아래 `getIP()` 메서드를 `IPController.php`에 추가하십시오:
 
 ```php
 public function getIP(): JsonResponse
@@ -106,22 +106,22 @@ public function getIP(): JsonResponse
 }
 ```
 
-This method utilizes Laravel's `Http` client to retrieve your IP address from `https://httpbin.io/ip` and returns it as JSON.
+이 메서드는 Laravel의 `Http` client를 사용해 `https://httpbin.io/ip`에서 IPアドレス를 가져와 JSON으로 반환합니다.
 
-Remember to include these two imports:
+다음 두 import를 포함하는 것을 잊지 마십시오:
 
 ```php
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 ```
 
-Since you want your Laravel application to provide stateless APIs, enable API routing with the [`install:api`](https://laravel.com/docs/master/routing#api-routes) Artisan command:
+Laravel 애플리케이션이 stateless API를 제공하도록 하려면 [`install:api`](https://laravel.com/docs/master/routing#api-routes) Artisan command로 API routing을 활성화하십시오:
 
 ```sh
 php artisan install:api
 ```
 
-To expose this method through an API endpoint, add the following route to the `routes/api.php` file:
+이 메서드를 API エンドポイント로 노출하려면 `routes/api.php` 파일에 다음 route를 추가하십시오:
 
 ```php
 use App\Http\Controllers\IPController;
@@ -129,33 +129,33 @@ use App\Http\Controllers\IPController;
 Route::get('/v1/get-ip', [IPController::class, 'getIP']);
 ```
 
-Your new API endpoint will be accessible at:
+새 API エンドポイント는 다음에서 접근할 수 있습니다:
 
 ```php
 /api/v1/get-ip
 ```
 
-**Note**: Remember that all Laravel APIs are available under the `/api` path by default.
+**Note**: Laravel의 모든 API는 기본적으로 `/api` 경로 아래에서 제공된다는 점을 기억하십시오.
 
-Time to test the `/api/v1/get-ip` endpoint!
+이제 `/api/v1/get-ip` エンドポイント를 테스트할 시간입니다!
 
-Launch the Laravel development server by running:
+다음 명령을 실행하여 Laravel 개발 서버를 실행하십시오:
 
 ```sh
 php artisan serve
 ```
 
-Your server should now be listening locally on port `8000`.
+이제 서버는 로컬의 `8000` 포트에서 대기하고 있어야 합니다.
 
-Make a `GET` request to the `/api/v1/get-ip` endpoint using cURL:
+cURL을 사용하여 `/api/v1/get-ip` エンドポイント로 `GET` リクエ스트를 보냅니다:
 
 ```sh
 curl -X GET 'http://localhost:8000/api/v1/get-ip' 
 ```
 
-**Note**: On Windows, substitute `curl` with `curl.exe`. Learn more in our guide on [how to send GET requests with cURL](https://brightdata.com/faqs/curl/curl-get-requests).
+**Note**: Windows에서는 `curl` 대신 `curl.exe`를 사용하십시오. 자세한 내용은 [cURL로 GET 요청 보내는 방법](https://brightdata.co.kr/faqs/curl/curl-get-requests) 가이드를 참고하십시오.
 
-You should receive a response similar to:
+다음과 유사한 レスポンス를 받아야 합니다:
 
 ```json
 {
@@ -163,31 +163,31 @@ You should receive a response similar to:
 }
 ```
 
-This response matches exactly what the `/ip` endpoint of HttpBin produces, confirming that your Laravel API works correctly. Specifically, the IP address shown is your machine's public IP.
+이 レスポンス는 HttpBin의 `/ip` エンドポイント가 생성하는 것과 정확히 일치하며, Laravel API가 정상적으로 작동함을 확인해 줍니다. 특히 표시되는 IPアドレス는 사용 중인 머신의 공인 IP입니다.
 
 ### Step #3: Retrieve a Proxy
 
-To use a proxy in your Laravel application, you first need access to a functioning proxy server.
+Laravel 애플리케이션에서 プロキ시를 사용하려면 먼저 동작하는 プロ키시 서버에 접근할 수 있어야 합니다.
 
-A typical proxy URL follows this format:
+일반적인 プロ키시 URL은 다음 형식을 따릅니다:
 
 ```
 <protocol>://<host>:<port>
 ```
 
-Where:
+여기서:
 
-- `protocol` is the protocol needed to connect to the proxy server (e.g., `http`, `https`, `socks5`)
-- `host` is the IP address or domain of the proxy server
-- `port` is the port used to route the traffic
+- `protocol`은 プロ키시 서버에 연결하는 데 필요한 프로토콜입니다(예: `http`, `https`, `socks5`)
+- `host`는 プロ키시 서버의 IPアドレス 또는 도메인입니다
+- `port`는 트래픽을 라우팅하는 데 사용되는 포트입니다
 
-For this example, assume your proxy URL is:
+이 예시에서는 プロ키시 URL이 다음과 같다고 가정합니다:
 
 ```
 http://66.29.154.103:3128
 ```
 
-Store this in a variable inside the `getIP()` method:
+이를 `getIP()` 메서드 안의 변수에 저장하십시오:
 
 ```php
 $proxyUrl = 'http://66.29.154.103:3128';
@@ -195,7 +195,7 @@ $proxyUrl = 'http://66.29.154.103:3128';
 
 ### Step #4: Integrate the Proxy in `Http`
 
-Incorporating a proxy into Laravel using the `Http` client requires minimal additional configuration:
+`Http` client를 사용하여 Laravel에 プロ키시를 통합하려면 추가 설정이 거의 필요하지 않습니다:
 
 ```php
 $proxyUrl = 'http://66.29.154.103:3128';
@@ -207,11 +207,11 @@ $response = Http::withOptions([
 $responseData = $response->json();
 ```
 
-You need to pass the proxy URL as an option using the [`withOptions()`](https://laravel.com/docs/11.x/http-client#guzzle-options) method. This instructs Laravel's HTTP client to route the request through the specified proxy server, using [Guzzle's `proxy` option](https://docs.guzzlephp.org/en/stable/request-options.html#proxy).
+[`withOptions()`](https://laravel.com/docs/11.x/http-client#guzzle-options) 메서드를 사용하여 옵션으로 プロ키시 URL을 전달해야 합니다. 이는 Laravel의 HTTP client에 [Guzzle의 `proxy` 옵션](https://docs.guzzlephp.org/en/stable/request-options.html#proxy)을 사용하여 지정된 プロ키시 서버를 통해 リクエスト를 라우팅하도록 지시합니다.
 
 ### Step #5: Put It All Together
 
-Your final Laravel API logic with proxy integration should now look like this:
+이제 プロ키시 통합이 포함된 최종 Laravel API 로직은 다음과 같아야 합니다:
 
 ```php
 <?php
@@ -244,19 +244,19 @@ class IPController extends Controller
 }
 ```
 
-Test it by running Laravel locally:
+Laravel을 로컬에서 실행하여 테스트하십시오:
 
 ```sh
 php artisan serve
 ```
 
-And connect to the `/api/v1/get-ip` endpoint again:
+그리고 `/api/v1/get-ip` エンドポイント에 다시 연결합니다:
 
 ```sh
 curl -X GET 'http://localhost:8000/api/v1/get-ip' 
 ```
 
-This time, the output should look something like:
+이번에는 출력이 다음과 유사해야 합니다:
 
 ```json
 {
@@ -264,41 +264,41 @@ This time, the output should look something like:
 }
 ```
 
-The `"origin"` field displays the IP address of the proxy server, confirming that your actual IP is now concealed behind the proxy.
+`"origin"` 필드는 プロ키시 서버의 IPアドレス를 표시하므로, 이제 실제 IP가 プロ키시 뒤에 숨겨졌음을 확인할 수 있습니다.
 
 > **Warning**:
 > 
-> Free proxy servers are typically unstable or short-lived. By the time you try this, the example proxy may no longer be operational. If necessary, replace the `$proxyUrl` with a currently active one before testing.
+> 무료 プロ키시 서버는 일반적으로 불안정하거나 수명이 짧습니다. 여러분이 시도할 때쯤에는 예시 プロ키시가 더 이상 동작하지 않을 수 있습니다. 필요하다면 테스트 전에 `$proxyUrl`을 현재 활성화된 것으로 교체하십시오.
 
-If you encounter SSL errors while making the request, refer to the troubleshooting tips provided in the advanced use cases section below.
+リクエ스트 수행 중 SSL 오류가 발생하면, 아래 고급 사용 사례 섹션에 제공된 문제 해결 팁을 참고하십시오.
 
 ## Advanced Use Cases
 
-You've just mastered the basics of proxy integration with Laravel, but there are additional advanced scenarios to consider.
+이제 Laravel에서의 プロ키시 통합 기본을 마스터하셨지만, 추가로 고려할 고급 시나리오가 있습니다.
 
 ### Proxy Authentication
 
-Premium proxies often require authentication to ensure only authorized users can access them. Without proper credentials, you'll encounter this error:
+프리미엄 プロ키시는 종종 認証을 요구하여 승인된 사용자만 접근하도록 합니다. 올바른 자격 증명이 없으면 다음 오류가 발생합니다:
 
 ```
 cURL error 56: CONNECT tunnel failed, response 407
 ```
 
-The URL of an authenticated proxy typically follows this format:
+認証이 필요한 プロ키시 URL은 일반적으로 다음 형식을 따릅니다:
 
 ```
 <protocol>://<username>:<password>@<host>:<port>
 ```
 
-Where `username` and `password` are your authentication credentials.
+여기서 `username`과 `password`는 認証 자격 증명입니다.
 
-Laravel's `Http` class (which uses Guzzle under the hood) fully supports authenticated proxies. Little modification is needed—simply include the authentication credentials directly in the proxy URL:
+(내부적으로 Guzzle을 사용하는) Laravel의 `Http` 클래스는 認証 プロ키시를 완전히 지원합니다. 큰 수정은 필요 없으며, プロ키시 URL에 認証 자격 증명을 직접 포함하기만 하면 됩니다:
 
 ```php
 $proxyUrl = '<protocol>://<username>:<password>@<host>:<port>';
 ```
 
-For example:
+예를 들면 다음과 같습니다:
 
 ```php
 // authenticated proxy with username and password
@@ -309,21 +309,21 @@ $response = Http::withOptions([
 ])->get('https://httpbin.io/ip');
 ```
 
-Replace the value of `$proxyUrl` with a valid authenticated proxy URL.
+`$proxyUrl` 값을 유효한 認証 プロ키시 URL로 바꾸십시오.
 
-`Http` will now direct the traffic to the configured authenticated proxy server!
+이제 `Http`가 구성된 認証 プロ키시 서버로 트래픽을 전달합니다!
 
 ### Avoid SSL Certificate Issues
 
-When configuring a proxy with Laravel's `Http` client, your requests might fail due to SSL certificate verification errors like:
+Laravel의 `Http` client로 プロ키시를 구성할 때, 다음과 같은 SSL 인증서 검증 오류로 リクエ스트가 실패할 수 있습니다:
 
 ```
 cURL error 60: SSL certificate problem: self-signed certificate in certificate chain
 ```
 
-This typically occurs when the proxy server uses a self-signed [SSL certificate](https://www.cloudflare.com/learning/ssl/what-is-an-ssl-certificate/).
+이는 보통 プロ키시 서버가 self-signed [SSL certificate](https://www.cloudflare.com/learning/ssl/what-is-an-ssl-certificate/)를 사용할 때 발생합니다.
 
-If you trust the proxy server and you're only testing locally or in a secure environment, you can disable SSL verification:
+プロ키시 서버를 신뢰하며 로컬 테스트 또는 보안된 환경에서만 사용한다면 SSL 검증을 비활성화할 수 있습니다:
 
 ```php
 $response = Http::withOptions([
@@ -334,9 +334,9 @@ $response = Http::withOptions([
 
 > **Warning**:
 > 
-> Disabling SSL verification makes you vulnerable to man-in-the-middle attacks. Use this option only in trusted environments.
+> SSL 검증을 비활성화하면 man-in-the-middle 공격에 취약해집니다. 신뢰할 수 있는 환경에서만 이 옵션을 사용하십시오.
 
-Alternatively, if you have the [proxy server's certificate file](https://docs.brightdata.com/general/account/ssl-certificate) (e.g., `proxy-ca.crt`), you can use it for SSL verification:
+또는 [프로키시 서버의 인증서 파일](https://docs.brightdata.com/general/account/ssl-certificate)(예: `proxy-ca.crt`)이 있다면 이를 SSL 검증에 사용할 수 있습니다:
 
 ```php
 $response = Http::withOptions([
@@ -345,21 +345,21 @@ $response = Http::withOptions([
 ])->get('https://httpbin.io/ip');
 ```
 
-Ensure the `proxy-ca.crt` file is stored in a secure and accessible directory (e.g., `storage/certs/`), and Laravel has permission to read it.
+`proxy-ca.crt` 파일이 안전하고 접근 가능한 디렉터리(예: `storage/certs/`)에 저장되어 있고, Laravel이 이를 읽을 권한이 있는지 확인하십시오.
 
-With either approach implemented, the SSL verification error caused by the proxy should be resolved.
+어느 접근 방식을 적용하든, プरो키시로 인해 발생한 SSL 검증 오류는 해결되어야 합니다.
 
 ### Proxy Rotation
 
-If you repeatedly use the same proxy server, the target website will likely eventually detect and block that proxy's IP address. To prevent this, you can [rotate your proxy servers](https://brightdata.com/blog/how-tos/how-to-rotate-an-ip-address)—using a different one for each request.
+같은 プロ키시 서버를 반복해서 사용하면, 대상 웹사이트가 결국 해당 プロ키시의 IPアドレス를 감지하고 차단할 가능성이 높습니다. 이를 방지하기 위해 각 リクエ스트마다 다른 것을 사용하는 방식으로 [プロ키시 서버를 로ーテ이션](https://brightdata.co.kr/blog/how-tos/how-to-rotate-an-ip-address)할 수 있습니다.
 
-Here are the steps to rotate proxies in Laravel:
+Laravel에서 プロ키시를 로ーテーション하는 단계는 다음과 같습니다:
 
-1. Create an array containing multiple proxy URLs
-2. Randomly select one before each request
-3. Set the selected proxy in the HTTP client configuration
+1. 여러 プロ키시 URL을 포함하는 배열을 만듭니다
+2. 각 リクエ스트 전에 임의로 하나를 선택합니다
+3. 선택된 プロ키시를 HTTP client 구성에 설정합니다
 
-Implement this with the following code:
+다음 코드로 이를 구현하십시오:
 
 ```php
 <?php
@@ -403,56 +403,56 @@ class IPController extends Controller
 }
 ```
 
-This snippet demonstrates how to randomly select a proxy from a list to implement proxy rotation. While effective, this approach has limitations:
+이 스니펫은 목록에서 プロ키시를 무작위로 선택하여 로ーテーション을 구현하는 방법을 보여줍니다. 효과적이긴 하지만, 이 접근에는 한계가 있습니다:
 
-1. You must maintain a collection of reliable proxy servers, which typically comes at a cost.
-2. For effective rotation, the proxy pool must be sufficiently large. Without enough proxies, the same servers will be used repeatedly, potentially leading to detection and blocking.
+1. 신뢰할 수 있는 プロ키시 서버 컬렉션을 유지해야 하며, 이는 일반적으로 비용이 듭니다.
+2. 효과적인 로ーテーション을 위해서는 プロ키시 풀의 규모가 충분히 커야 합니다. プロ키시가 충분하지 않으면 동일한 서버가 반복 사용되어 감지 및 차단으로 이어질 수 있습니다.
 
-To overcome these challenges, consider using [Bright Data's rotating proxy network](https://brightdata.com/solutions/rotating-proxies).
+이러한 과제를 극복하기 위해 [Bright Data의 로ーテーティングプロキ시 네트워크](https://brightdata.co.kr/solutions/rotating-proxies) 사용을 고려해 보십시오.
 
 ## Use a Bright Data Proxy in Laravel
 
-Follow these steps to implement Bright Data's residential proxies with Laravel.
+다음 단계에 따라 Bright Data의 レジデンシャルプロキ시를 Laravel과 함께 구현하십시오.
 
-If you don't have an account yet, [sign up with Bright Data](https://brightdata.com/cp/start). If you already have one, log in to access your user dashboard:
+아직 계정이 없다면 [Bright Data에 가입](https://brightdata.co.kr/cp/start)하십시오. 이미 계정이 있다면 로그인하여 사용자 대시보드에 접근하십시오:
 
 ![The Bright Data dashboard](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-Bright-Data-dashboard.png)
 
-After logging in, click the "Get proxy products" button:
+로그인 후 "Get proxy products" 버튼을 클릭하십시오:
 
 ![Clicking the "Get proxy products" button](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/Clicking-the-Get-proxy-products-button.png)
 
-You'll be directed to the "Proxies & Scraping Infrastructure" page:
+"Proxies & Scraping Infrastructure" 페이지로 이동합니다:
 
 ![The "Proxies & Scraping Infrastructure" page](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-Proxies-Scraping-Infrastructure-page-1.png)
 
-In the table, locate the "Residential" row and click on it:
+테이블에서 "Residential" 행을 찾아 클릭하십시오:
 
 ![Clicking the "residential" row](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/Clicking-the-residential-row.png)
 
-You'll be taken to the residential proxy page:
+레ジデンシャルプロキ시 페이지로 이동합니다:
 
 ![The "residential" page](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-residential-page.png)
 
-For first-time users, follow the setup wizard to configure the proxy service according to your requirements. For additional assistance, feel free to [contact their 24/7 support team](https://brightdata.com/contact).
+처음 사용하는 사용자는 설정 마법사를 따라 요구 사항에 맞게 プロ키시 서비스를 구성하십시오. 추가 지원이 필요하면 언제든지 [24/7 지원 팀에 문의](https://brightdata.co.kr/contact)하실 수 있습니다.
 
-On the "Overview" tab, find your proxy's host, port, username, and password:
+"Overview" 탭에서 プロ키시의 host, port, username, password를 확인하십시오:
 
 ![The proxy credentials](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-proxy-credentials.png)
 
-Use these details to construct your proxy URL:
+이 정보를 사용해 プロ키시 URL을 구성하십시오:
 
 ```php
 $proxyUrl = 'http://<brightdata_proxy_username>:<brightdata_proxy_password>@<brightdata_proxy_host>:<brightdata_proxy_port>';
 ```
 
-Replace the placeholders (`<brightdata_proxy_username>`, `<brightdata_proxy_password>`, `<brightdata_proxy_host>`, `<brightdata_proxy_port>`) with your actual proxy credentials.
+플레이스홀더(`<brightdata_proxy_username>`, `<brightdata_proxy_password>`, `<brightdata_proxy_host>`, `<brightdata_proxy_port>`)를 실제 プロ키시 자격 증명으로 교체하십시오.
 
-Make sure to toggle the "Off" switch to enable the proxy product, and complete the remaining setup instructions:
+"Off" 스위치를 토글하여 プロ키시 제품을 활성화하고, 나머지 설정 지침을 완료하십시오:
 
 ![Clicking the activation toggle](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/Clicking-the-activation-toggle.png)
 
-With your proxy URL configured, you can now integrate it into Laravel using the `Http` client. Here's the code to send a request via Bright Data's rotating residential proxy in Laravel:
+プロ키시 URL이 구성되었으면, `Http` client를 사용해 Laravel에 통합할 수 있습니다. 다음은 Laravel에서 Bright Data의 로ーテーティング レジデンシャルプロキ시를 통해 リクエ스트를 보내는 코드입니다:
 
 ```php
 public function getIp()
@@ -472,19 +472,19 @@ public function getIp()
 }
 ```
 
-Each time you execute this script, you'll observe a different exit IP.
+이 스크립트를 실행할 때마다 서로 다른 출구 IP를 확인할 수 있습니다.
 
 ## [Extra] Symfony's `HttpClient` Proxy Integration
 
-If you prefer Symfony's `HttpClient` component over Laravel's default HTTP client `Http`, follow these instructions to implement proxy integration with `HttpClient` in Laravel.
+Laravel 기본 HTTP client `Http`보다 Symfony의 `HttpClient` 컴포넌트를 선호한다면, 다음 지침에 따라 Laravel에서 `HttpClient`로 プロ키시 통합을 구현하십시오.
 
-First, install the Symfony HTTP client package via Composer:
+먼저 Composer를 통해 Symfony HTTP client 패키지를 설치합니다:
 
 ```sh
 composer require symfony/http-client
 ```
 
-Next, you can utilize Symfony's `HttpClient` with a proxy as follows:
+다음으로 아래와 같이 プロ키시와 함께 Symfony의 `HttpClient`를 사용할 수 있습니다:
 
 ```php
 <?php
@@ -522,10 +522,10 @@ class IpController extends Controller
 }
 ```
 
-This configuration allows you to use Symfony's `HttpClient` to send requests through a proxy.
+이 구성은 Symfony의 `HttpClient`를 사용하여 プロ키시를 통해 リクエ스트를 전송할 수 있게 해줍니다.
 
 ## Conclusion
 
-Free proxy services can be unreliable and potentially risky. For consistent performance, security, and scalability, you need a trusted proxy provider. Save time and effort by choosing the [market-leading proxy provider](https://brightdata.com/blog/proxy-101/best-proxy-providers), Bright Data.
+무료 プロ키시 서비스는 신뢰할 수 없고 잠재적으로 위험할 수 있습니다. 일관된 성능, 보안, 확장성을 위해서는 신뢰할 수 있는 プロ키시 제공업체가 필요합니다. [시장 선도 プロ키시 제공업체](https://brightdata.co.kr/blog/proxy-101/best-proxy-providers) Bright Data를 선택하여 시간과 노력을 절약하십시오.
 
-Create an account and begin testing our proxies for free today!
+계정을 생성하고 오늘부터 무료로 당사의 プロ키시를 테스트해 보십시오!
