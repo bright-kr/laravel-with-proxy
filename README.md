@@ -1,6 +1,6 @@
 # Laravel에서 プロキシ 사용하기
 
-[![Bright Data Promo](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.co.kr/)
+[![Bright Data Promo](https://github.com/bright-kr/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.co.kr/)
 
 이 가이드는 차단 없는 Webスクレイピング 및 지오ロ케ーション 기반 접근 제어를 위해 Laravel 프로젝트에서 プロキシ를 구성하고 구현하는 방법을 설명합니다.
 
@@ -65,7 +65,7 @@ composer create-project laravel/laravel laravel-proxies-application
 
 이 시점에서 디렉터리에는 표준 Laravel 파일 구조가 포함되어 있어야 합니다:
 
-![The Laravel projext structure](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-Laravel-projext-structure.png)
+![The Laravel projext structure](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/The-Laravel-projext-structure.png)
 
 ### Step #2: Define the Test API Endpoint
 
@@ -416,29 +416,29 @@ class IPController extends Controller
 
 아직 계정이 없다면 [Bright Data에 가입](https://brightdata.co.kr/cp/start)하십시오. 이미 계정이 있다면 로그인하여 사용자 대시보드에 접근하십시오:
 
-![The Bright Data dashboard](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-Bright-Data-dashboard.png)
+![The Bright Data dashboard](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/The-Bright-Data-dashboard.png)
 
 로그인 후 "Get proxy products" 버튼을 클릭하십시오:
 
-![Clicking the "Get proxy products" button](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/Clicking-the-Get-proxy-products-button.png)
+![Clicking the "Get proxy products" button](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/Clicking-the-Get-proxy-products-button.png)
 
 "Proxies & Scraping Infrastructure" 페이지로 이동합니다:
 
-![The "Proxies & Scraping Infrastructure" page](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-Proxies-Scraping-Infrastructure-page-1.png)
+![The "Proxies & Scraping Infrastructure" page](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/The-Proxies-Scraping-Infrastructure-page-1.png)
 
 테이블에서 "Residential" 행을 찾아 클릭하십시오:
 
-![Clicking the "residential" row](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/Clicking-the-residential-row.png)
+![Clicking the "residential" row](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/Clicking-the-residential-row.png)
 
 레ジデンシャルプロキ시 페이지로 이동합니다:
 
-![The "residential" page](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-residential-page.png)
+![The "residential" page](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/The-residential-page.png)
 
 처음 사용하는 사용자는 설정 마법사를 따라 요구 사항에 맞게 プロ키시 서비스를 구성하십시오. 추가 지원이 필요하면 언제든지 [24/7 지원 팀에 문의](https://brightdata.co.kr/contact)하실 수 있습니다.
 
 "Overview" 탭에서 プロ키시의 host, port, username, password를 확인하십시오:
 
-![The proxy credentials](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/The-proxy-credentials.png)
+![The proxy credentials](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/The-proxy-credentials.png)
 
 이 정보를 사용해 プロ키시 URL을 구성하십시오:
 
@@ -450,7 +450,7 @@ $proxyUrl = 'http://<brightdata_proxy_username>:<brightdata_proxy_password>@<bri
 
 "Off" 스위치를 토글하여 プロ키시 제품을 활성화하고, 나머지 설정 지침을 완료하십시오:
 
-![Clicking the activation toggle](https://github.com/luminati-io/laravel-with-proxy/blob/main/images/Clicking-the-activation-toggle.png)
+![Clicking the activation toggle](https://github.com/bright-kr/laravel-with-proxy/blob/main/images/Clicking-the-activation-toggle.png)
 
 プロ키시 URL이 구성되었으면, `Http` client를 사용해 Laravel에 통합할 수 있습니다. 다음은 Laravel에서 Bright Data의 로ーテーティング レジデンシャルプロキ시를 통해 リクエ스트를 보내는 코드입니다:
 
