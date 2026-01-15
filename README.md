@@ -1,8 +1,8 @@
-# Laravel에서 プロキシ 사용하기
+# Laravel에서 프록시 사용하기
 
 [![Bright Data Promo](https://github.com/bright-kr/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.co.kr/)
 
-이 가이드는 차단 없는 Webスクレイピング 및 지오ロ케ーション 기반 접근 제어를 위해 Laravel 프로젝트에서 プロキシ를 구성하고 구현하는 방법을 설명합니다.
+이 가이드는 차단 없는 Web스크레이핑 및 지오ロ케ーション 기반 접근 제어를 위해 Laravel 프로젝트에서 프록시를 구성하고 구현하는 방법을 설명합니다.
 
 - [Laravel Proxy란 무엇입니까?](#what-is-a-laravel-proxy)
 - [Laravel에서 プロキ시 사용 사례](#use-cases-for-proxies-in-laravel)
@@ -13,24 +13,24 @@
 
 ## What Is a Laravel Proxy?
 
-Laravel プロキ시는 Laravel 애플리케이션과 외부 서버 사이에서 중개자 역할을 합니다. 이를 통해 서버 트래픽을 프로그래밍 방식으로 [프로キ시 서버를 통해](https://brightdata.co.kr/blog/proxy-101/what-is-proxy-server) 전달하여 IPアドレス를 숨길 수 있습니다.
+Laravel プロキ시는 Laravel 애플리케이션과 외부 서버 사이에서 중개자 역할을 합니다. 이를 통해 서버 트래픽을 프로그래밍 방식으로 [프로キ시 서버를 통해](https://brightdata.co.kr/blog/proxy-101/what-is-proxy-server) 전달하여 IP 주소를 숨길 수 있습니다.
 
 Laravel에서 プロキ시가 동작하는 방식은 다음과 같습니다:
 
-1. Laravel이 プロキ시 구성이 포함된 HTTP 클라이언트 라이브러리를 사용하여 HTTP リクエスト를 시작합니다.
+1. Laravel이 プロキ시 구성이 포함된 HTTP 클라이언트 라이브러리를 사용하여 HTTP 요청를 시작합니다.
 2. リクエ스트가 プロキ시 서버를 통해 이동합니다.
 3. プロキ시가 이를 대상 서버로 전송합니다.
-4. 대상 서버가 レスポンス를 プロキ시에 반환합니다.
-5. プロキ시가 レスポンス를 Laravel로 중계합니다.
+4. 대상 서버가 응답를 プロキ시에 반환합니다.
+5. プロキ시가 응답를 Laravel로 중계합니다.
 
-그 결과, 대상 서버는 리クエ스트가 Laravel 서버가 아니라 プロキ시의 IP에서 발생한 것으로 인식합니다. 이 메커니즘은 지리적 제한 우회, 익명성 강화, レート制限 처리에 도움이 됩니다.
+그 결과, 대상 서버는 리クエ스트가 Laravel 서버가 아니라 プロキ시의 IP에서 발생한 것으로 인식합니다. 이 메커니즘은 지리적 제한 우회, 익명성 강화, 속도 제한 처리에 도움이 됩니다.
 
 ## Use Cases for Proxies in Laravel
 
 Laravel에서 プロキ시는 다양한 목적에 사용되지만, 특히 다음 세 가지가 흔합니다:
 
-- **Webスクレイピング**: Webスクレイピング API를 만들 때 IP 차단을 방지하고, レート制限을 우회하거나, 기타 제한을 피하기 위해 プロキ시를 구현합니다. 추가 정보는 [Laravel로 web scraping하기](https://brightdata.co.kr/blog/web-data/web-scraping-with-laravel) 튜토리얼을 참고하십시오.
-- **서드파티 API의 レート制限 우회**: プロキ시 IP를 번갈아 사용하여 API 사용량 쿼터 내에 머무르고 스로틀링을 방지합니다.
+- **Web스크레이핑**: Web스크레이핑 API를 만들 때 IP 차단을 방지하고, 속도 제한을 우회하거나, 기타 제한을 피하기 위해 プロキ시를 구현합니다. 추가 정보는 [Laravel로 web scraping하기](https://brightdata.co.kr/blog/web-data/web-scraping-with-laravel) 튜토리얼을 참고하십시오.
+- **서드파티 API의 속도 제한 우회**: プロキ시 IP를 번갈아 사용하여 API 사용량 쿼터 내에 머무르고 스로틀링을 방지합니다.
 - **지오 제한 콘텐츠 접근**: 특정 국가에서만 사용 가능한 서비스를 이용하기 위해 특정 위치의 プロキ시 서버를 선택합니다.
 
 추가 예시는 [web data 및 プロキ시 사용 사례](https://brightdata.co.kr/use-cases) 가이드를 참고하십시오.
@@ -43,13 +43,13 @@ Laravel에서 プロキ시는 다양한 목적에 사용되지만, 특히 다음
 > 
 > Laravel의 HTTP client는 Guzzle 기반이므로, [Guzzle プロ키시 통합 가이드](https://brightdata.co.kr/blog/how-tos/proxy-with-guzzle)도 함께 확인하시는 것이 좋습니다.
 
-통합을 설명하기 위해 다음을 수행하는 `GET` `/api/v1/get-ip` エンドポイント를 구성하겠습니다:
+통합을 설명하기 위해 다음을 수행하는 `GET` `/api/v1/get-ip` 엔드포인트를 구성하겠습니다:
 
-1. 구성된 プロ키시를 사용하여 [`https://httpbin.io/ip`](https://httpbin.io/ip)에 `GET` リクエスト를 전송합니다.
-2. レスポンス에서 출구 IPアドレス를 추출합니다.
-3. 해당 IP를 Laravel エンドポイント를 호출한 클라이언트에 반환합니다.
+1. 구성된 プロ키시를 사용하여 [`https://httpbin.io/ip`](https://httpbin.io/ip)에 `GET` 요청를 전송합니다.
+2. 응답에서 출구 IP 주소를 추출합니다.
+3. 해당 IP를 Laravel 엔드포인트를 호출한 클라이언트에 반환합니다.
 
-모든 것이 올바르게 구성되었다면, API가 반환하는 IP는 プロ키시의 IPアドレス와 일치합니다.
+모든 것이 올바르게 구성되었다면, API가 반환하는 IP는 プロ키시의 IP 주소와 일치합니다.
 
 ### Step #1: Project Setup
 
@@ -106,7 +106,7 @@ public function getIP(): JsonResponse
 }
 ```
 
-이 메서드는 Laravel의 `Http` client를 사용해 `https://httpbin.io/ip`에서 IPアドレス를 가져와 JSON으로 반환합니다.
+이 메서드는 Laravel의 `Http` client를 사용해 `https://httpbin.io/ip`에서 IP 주소를 가져와 JSON으로 반환합니다.
 
 다음 두 import를 포함하는 것을 잊지 마십시오:
 
@@ -121,7 +121,7 @@ Laravel 애플리케이션이 stateless API를 제공하도록 하려면 [`insta
 php artisan install:api
 ```
 
-이 메서드를 API エンドポイント로 노출하려면 `routes/api.php` 파일에 다음 route를 추가하십시오:
+이 메서드를 API 엔드포인트로 노출하려면 `routes/api.php` 파일에 다음 route를 추가하십시오:
 
 ```php
 use App\Http\Controllers\IPController;
@@ -129,7 +129,7 @@ use App\Http\Controllers\IPController;
 Route::get('/v1/get-ip', [IPController::class, 'getIP']);
 ```
 
-새 API エンドポイント는 다음에서 접근할 수 있습니다:
+새 API 엔드포인트는 다음에서 접근할 수 있습니다:
 
 ```php
 /api/v1/get-ip
@@ -137,7 +137,7 @@ Route::get('/v1/get-ip', [IPController::class, 'getIP']);
 
 **Note**: Laravel의 모든 API는 기본적으로 `/api` 경로 아래에서 제공된다는 점을 기억하십시오.
 
-이제 `/api/v1/get-ip` エンドポイント를 테스트할 시간입니다!
+이제 `/api/v1/get-ip` 엔드포인트를 테스트할 시간입니다!
 
 다음 명령을 실행하여 Laravel 개발 서버를 실행하십시오:
 
@@ -147,7 +147,7 @@ php artisan serve
 
 이제 서버는 로컬의 `8000` 포트에서 대기하고 있어야 합니다.
 
-cURL을 사용하여 `/api/v1/get-ip` エンドポイント로 `GET` リクエ스트를 보냅니다:
+cURL을 사용하여 `/api/v1/get-ip` 엔드포인트로 `GET` リクエ스트를 보냅니다:
 
 ```sh
 curl -X GET 'http://localhost:8000/api/v1/get-ip' 
@@ -155,7 +155,7 @@ curl -X GET 'http://localhost:8000/api/v1/get-ip'
 
 **Note**: Windows에서는 `curl` 대신 `curl.exe`를 사용하십시오. 자세한 내용은 [cURL로 GET 요청 보내는 방법](https://brightdata.co.kr/faqs/curl/curl-get-requests) 가이드를 참고하십시오.
 
-다음과 유사한 レスポンス를 받아야 합니다:
+다음과 유사한 응답를 받아야 합니다:
 
 ```json
 {
@@ -163,7 +163,7 @@ curl -X GET 'http://localhost:8000/api/v1/get-ip'
 }
 ```
 
-이 レスポンス는 HttpBin의 `/ip` エンドポイント가 생성하는 것과 정확히 일치하며, Laravel API가 정상적으로 작동함을 확인해 줍니다. 특히 표시되는 IPアドレス는 사용 중인 머신의 공인 IP입니다.
+이 응답는 HttpBin의 `/ip` 엔드포인트가 생성하는 것과 정확히 일치하며, Laravel API가 정상적으로 작동함을 확인해 줍니다. 특히 표시되는 IP 주소는 사용 중인 머신의 공인 IP입니다.
 
 ### Step #3: Retrieve a Proxy
 
@@ -178,7 +178,7 @@ Laravel 애플리케이션에서 プロキ시를 사용하려면 먼저 동작�
 여기서:
 
 - `protocol`은 プロ키시 서버에 연결하는 데 필요한 프로토콜입니다(예: `http`, `https`, `socks5`)
-- `host`는 プロ키시 서버의 IPアドレス 또는 도메인입니다
+- `host`는 プロ키시 서버의 IP 주소 또는 도메인입니다
 - `port`는 트래픽을 라우팅하는 데 사용되는 포트입니다
 
 이 예시에서는 プロ키시 URL이 다음과 같다고 가정합니다:
@@ -207,7 +207,7 @@ $response = Http::withOptions([
 $responseData = $response->json();
 ```
 
-[`withOptions()`](https://laravel.com/docs/11.x/http-client#guzzle-options) 메서드를 사용하여 옵션으로 プロ키시 URL을 전달해야 합니다. 이는 Laravel의 HTTP client에 [Guzzle의 `proxy` 옵션](https://docs.guzzlephp.org/en/stable/request-options.html#proxy)을 사용하여 지정된 プロ키시 서버를 통해 リクエスト를 라우팅하도록 지시합니다.
+[`withOptions()`](https://laravel.com/docs/11.x/http-client#guzzle-options) 메서드를 사용하여 옵션으로 プロ키시 URL을 전달해야 합니다. 이는 Laravel의 HTTP client에 [Guzzle의 `proxy` 옵션](https://docs.guzzlephp.org/en/stable/request-options.html#proxy)을 사용하여 지정된 プロ키시 서버를 통해 요청를 라우팅하도록 지시합니다.
 
 ### Step #5: Put It All Together
 
@@ -250,7 +250,7 @@ Laravel을 로컬에서 실행하여 테스트하십시오:
 php artisan serve
 ```
 
-그리고 `/api/v1/get-ip` エンドポイント에 다시 연결합니다:
+그리고 `/api/v1/get-ip` 엔드포인트에 다시 연결합니다:
 
 ```sh
 curl -X GET 'http://localhost:8000/api/v1/get-ip' 
@@ -264,7 +264,7 @@ curl -X GET 'http://localhost:8000/api/v1/get-ip'
 }
 ```
 
-`"origin"` 필드는 プロ키시 서버의 IPアドレス를 표시하므로, 이제 실제 IP가 プロ키시 뒤에 숨겨졌음을 확인할 수 있습니다.
+`"origin"` 필드는 プロ키시 서버의 IP 주소를 표시하므로, 이제 실제 IP가 プロ키시 뒤에 숨겨졌음을 확인할 수 있습니다.
 
 > **Warning**:
 > 
@@ -278,21 +278,21 @@ curl -X GET 'http://localhost:8000/api/v1/get-ip'
 
 ### Proxy Authentication
 
-프리미엄 プロ키시는 종종 認証을 요구하여 승인된 사용자만 접근하도록 합니다. 올바른 자격 증명이 없으면 다음 오류가 발생합니다:
+프리미엄 プロ키시는 종종 인증을 요구하여 승인된 사용자만 접근하도록 합니다. 올바른 자격 증명이 없으면 다음 오류가 발생합니다:
 
 ```
 cURL error 56: CONNECT tunnel failed, response 407
 ```
 
-認証이 필요한 プロ키시 URL은 일반적으로 다음 형식을 따릅니다:
+인증이 필요한 プロ키시 URL은 일반적으로 다음 형식을 따릅니다:
 
 ```
 <protocol>://<username>:<password>@<host>:<port>
 ```
 
-여기서 `username`과 `password`는 認証 자격 증명입니다.
+여기서 `username`과 `password`는 인증 자격 증명입니다.
 
-(내부적으로 Guzzle을 사용하는) Laravel의 `Http` 클래스는 認証 プロ키시를 완전히 지원합니다. 큰 수정은 필요 없으며, プロ키시 URL에 認証 자격 증명을 직접 포함하기만 하면 됩니다:
+(내부적으로 Guzzle을 사용하는) Laravel의 `Http` 클래스는 인증 プロ키시를 완전히 지원합니다. 큰 수정은 필요 없으며, プロ키시 URL에 인증 자격 증명을 직접 포함하기만 하면 됩니다:
 
 ```php
 $proxyUrl = '<protocol>://<username>:<password>@<host>:<port>';
@@ -309,9 +309,9 @@ $response = Http::withOptions([
 ])->get('https://httpbin.io/ip');
 ```
 
-`$proxyUrl` 값을 유효한 認証 プロ키시 URL로 바꾸십시오.
+`$proxyUrl` 값을 유효한 인증 プロ키시 URL로 바꾸십시오.
 
-이제 `Http`가 구성된 認証 プロ키시 서버로 트래픽을 전달합니다!
+이제 `Http`가 구성된 인증 プロ키시 서버로 트래픽을 전달합니다!
 
 ### Avoid SSL Certificate Issues
 
@@ -351,7 +351,7 @@ $response = Http::withOptions([
 
 ### Proxy Rotation
 
-같은 プロ키시 서버를 반복해서 사용하면, 대상 웹사이트가 결국 해당 プロ키시의 IPアドレス를 감지하고 차단할 가능성이 높습니다. 이를 방지하기 위해 각 リクエ스트마다 다른 것을 사용하는 방식으로 [プロ키시 서버를 로ーテ이션](https://brightdata.co.kr/blog/how-tos/how-to-rotate-an-ip-address)할 수 있습니다.
+같은 プロ키시 서버를 반복해서 사용하면, 대상 웹사이트가 결국 해당 プロ키시의 IP 주소를 감지하고 차단할 가능성이 높습니다. 이를 방지하기 위해 각 リクエ스트마다 다른 것을 사용하는 방식으로 [プロ키시 서버를 로ーテ이션](https://brightdata.co.kr/blog/how-tos/how-to-rotate-an-ip-address)할 수 있습니다.
 
 Laravel에서 プロ키시를 로ーテーション하는 단계는 다음과 같습니다:
 
